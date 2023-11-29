@@ -3,6 +3,12 @@ import csv, os
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
+movies = []
+with open(os.path.join(__location__, 'movies.csv')) as f:
+    rows = csv.DictReader(f)
+    for r in rows:
+        movies.append(dict(r))
+
 class DB:
     def __init__(self):
         self.database = []
@@ -21,7 +27,15 @@ class Table:
     def __init__(self, table_name, table):
         self.table_name = table_name
         self.table = table
-    
+
+    def insert_row(self, dict):
+        self.table.
+
+
+    def update_row(self, primary_attribute, primary_attribute_value, update_attribute, update_value):
+        self.table.select([primary_attribute,update_attribute])
+        self[primary_attribute_value] = update_value
+
     def join(self, other_table, common_key):
         joined_table = Table(self.table_name + '_joins_' + other_table.table_name, [])
         for item1 in self.table:
@@ -100,3 +114,23 @@ class Table:
     def __str__(self):
         return self.table_name + ':' + str(self.table)
 
+table1 = Table('movies',movies)
+table1_filtered = table1.filter(lambda x: x['Genre'] == 'Comedy')
+table2_filtered = table1.filter(lambda x: x['Genre'] == 'Drama')
+table3_filtered = table1.filter(lambda x: x['Genre'] == 'Fantasy')
+#Find the average value of ‘Worldwide Gross’ for ‘Comedy’ movies
+print(table1_filtered.aggregate(lambda x: sum(x) / len(x), 'Worldwide Gross'))
+#Find the minimum ‘Audience score %’ for ‘Drama’ movies
+print(table2_filtered.aggregate(lambda x: min(x), 'Audience score %'))
+#Count the number of ‘Fantasy’ movie before invoking any of the above two methods
+print(len(table3_filtered.select(['Genre'])))
+##
+dict = {}
+dict['Film'] = 'The Shape of Water'
+dict['Genre'] = 'Fantasy'
+dict['Lead Studio'] = 'Fox'
+dict['Audience score %'] = '72'
+dict['Profitability'] = '9.765'
+dict['Rotten Tomatoes %'] = '92'
+dict['Worldwide Gross'] = '195.3'
+dict['Year'] = '2017'
