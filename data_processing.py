@@ -29,7 +29,8 @@ class Table:
         self.table = table
 
     def insert_row(self, dict):
-        self.table.
+        movies.append(dict)
+
 
 
     def update_row(self, primary_attribute, primary_attribute_value, update_attribute, update_value):
@@ -124,7 +125,7 @@ print(table1_filtered.aggregate(lambda x: sum(x) / len(x), 'Worldwide Gross'))
 print(table2_filtered.aggregate(lambda x: min(x), 'Audience score %'))
 #Count the number of ‘Fantasy’ movie before invoking any of the above two methods
 print(len(table3_filtered.select(['Genre'])))
-##
+#####
 dict = {}
 dict['Film'] = 'The Shape of Water'
 dict['Genre'] = 'Fantasy'
@@ -134,3 +135,7 @@ dict['Profitability'] = '9.765'
 dict['Rotten Tomatoes %'] = '92'
 dict['Worldwide Gross'] = '195.3'
 dict['Year'] = '2017'
+#And count the number of ‘Fantasy’ movie again
+table1.insert_row(dict)
+table4_filtered = table1.filter(lambda x: x['Genre'] == 'Fantasy')
+print(len(table4_filtered.select(['Genre'])))
