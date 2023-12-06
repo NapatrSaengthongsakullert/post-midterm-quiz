@@ -21,21 +21,15 @@ class DB:
             if table.table_name == table_name:
                 return table
         return None
-    
+
+
 import copy
+
+
 class Table:
     def __init__(self, table_name, table):
         self.table_name = table_name
         self.table = table
-
-    def insert_row(self, dict):
-        movies.append(dict)
-
-
-
-    def update_row(self, primary_attribute, primary_attribute_value, update_attribute, update_value):
-        self.table.select([primary_attribute,update_attribute])
-        self[primary_attribute_value] = update_value
 
     def join(self, other_table, common_key):
         joined_table = Table(self.table_name + '_joins_' + other_table.table_name, [])
@@ -47,7 +41,7 @@ class Table:
                     dict1.update(dict2)
                     joined_table.table.append(dict1)
         return joined_table
-    
+
     def filter(self, condition):
         filtered_table = Table(self.table_name + '_filtered', [])
         for item1 in self.table:
@@ -56,7 +50,7 @@ class Table:
         return filtered_table
 
     def __is_float(self, element):
-        if element is None: 
+        if element is None:
             return False
         try:
             float(element)
@@ -72,7 +66,7 @@ class Table:
             else:
                 temps.append(item1[aggregation_key])
         return function(temps)
-    
+
     def select(self, attributes_list):
         temps = []
         for item1 in self.table:
@@ -115,17 +109,40 @@ class Table:
     def __str__(self):
         return self.table_name + ':' + str(self.table)
 
-table1 = Table('movies',movies)
+    def insert_row(self, dict):
+        self.table.append(dict)
+        '''
+        This method inserts a dictionary, dict, into a Table object, effectively adding a row to the Table.
+        '''
+
+    def update_row(self, primary_attribute, primary_attribute_value, update_attribute, update_value):
+        for i in self.table:
+            if i[primary_attribute] == primary_attribute_value:
+                i[update_attribute] = update_value
+        '''
+        This method updates the current value of update_attribute to update_value
+        For example, my_table.update_row('Film', 'A Serious Man', 'Year', '2022') will change the 'Year' attribute for the 'Film'
+        'A Serious Man' from 2009 to 2022
+        '''
+
+
+##Find the average value of ‘Worldwide Gross’ for ‘Comedy’ movies##
+table1 = Table("movies",movies)
 table1_filtered = table1.filter(lambda x: x['Genre'] == 'Comedy')
+print(table1_filtered)
+table1_aggregated = table1_filtered.aggregate(lambda x:sum(x)/len(x), 'Worldwide Gross')
+print(table1_aggregated)
+##Find the minimum ‘Audience score %’ for ‘Drama’ movies##
 table2_filtered = table1.filter(lambda x: x['Genre'] == 'Drama')
+print(table2_filtered)
+table2_aggregated = table2_filtered.aggregate(lambda x:min(x), 'Audience score %')
+print(table2_aggregated)
+##Count the number of ‘Fantasy’ movie before invoking any of the above two methods##
 table3_filtered = table1.filter(lambda x: x['Genre'] == 'Fantasy')
-#Find the average value of ‘Worldwide Gross’ for ‘Comedy’ movies
-print(table1_filtered.aggregate(lambda x: sum(x) / len(x), 'Worldwide Gross'))
-#Find the minimum ‘Audience score %’ for ‘Drama’ movies
-print(table2_filtered.aggregate(lambda x: min(x), 'Audience score %'))
-#Count the number of ‘Fantasy’ movie before invoking any of the above two methods
-print(len(table3_filtered.select(['Genre'])))
-#####
+print(table3_filtered)
+table3_aggregated = table3_filtered.aggregate(lambda x:len(x), 'Genre')
+print(table3_aggregated)
+##Then, insert the following movie:##
 dict = {}
 dict['Film'] = 'The Shape of Water'
 dict['Genre'] = 'Fantasy'
@@ -135,7 +152,12 @@ dict['Profitability'] = '9.765'
 dict['Rotten Tomatoes %'] = '92'
 dict['Worldwide Gross'] = '195.3'
 dict['Year'] = '2017'
-#And count the number of ‘Fantasy’ movie again
+##And count the number of ‘Fantasy’ movie again##
 table1.insert_row(dict)
-table4_filtered = table1.filter(lambda x: x['Genre'] == 'Fantasy')
-print(len(table4_filtered.select(['Genre'])))
+table3_filtered = table1.filter(lambda x: x['Genre'] == 'Fantasy')
+print(table3_filtered)
+table3_aggregated = table3_filtered.aggregate(lambda x:len(x), 'Genre')
+print(table3_aggregated)
+##Then, update the  'Year' for the  'Film' :  'A Serious Man' to '2022'##
+table1.update_row('Film','A Serious Man','Year',2022)
+print(table1.filter(lambda x: x['Film'] == 'A Serious Man'))
